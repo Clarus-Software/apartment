@@ -16,10 +16,11 @@ WORKDIR /app
 # Adding gems
 COPY APARTMENT_VERSION APARTMENT_VERSION
 COPY Gemfile Gemfile
+COPY Appraisals Appraisals
 COPY ros-apartment.gemspec ros-apartment.gemspec
-# COPY Gemfile.lock Gemfile.lock
 RUN gem install bundler:2.5.5
 RUN bundle install
+RUN bundle exec appraisal install
 
 # Adding project files
 COPY . .
