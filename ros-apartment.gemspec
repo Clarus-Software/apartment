@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
-$LOAD_PATH << File.expand_path('lib', __dir__)
-require 'apartment/version'
+version = File.read(File.expand_path("APARTMENT_VERSION", __dir__)).strip
 
 Gem::Specification.new do |s|
   s.name = 'ros-apartment'
-  s.version = Apartment::VERSION
+  s.version = version
 
   s.authors       = ['Ryan Brunner', 'Brad Robertson', 'Rui Baltazar']
   s.summary       = 'A Ruby gem for managing database multitenancy. Apartment Gem drop in replacement'

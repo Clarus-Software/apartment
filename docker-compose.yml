@@ -1,9 +1,9 @@
-version: '2.3'
+version: "3"
 services:
   postgresql:
-    image: postgres:9.5.12
+    image: postgres:12.5
     environment:
-      POSTGRES_PASSWORD: ""
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
     healthcheck:
@@ -13,7 +13,7 @@ services:
       timeout: 30s
       retries: 3
   mysql:
-    image: mysql:5.7
+    image: mysql:8.0
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     ports:
@@ -24,10 +24,14 @@ services:
       interval: 10s
       timeout: 30s
       retries: 3
-  healthcheck:
-    image: busybox
+  app: &app
+    build:
+      context: .
     depends_on:
-      postgresql:
-        condition: service_healthy
-      mysql:
-        condition: service_healthy
+      - postgresql
+      - mysql
+    volumes:
+      - .:/app
+    environment:
+      - PG_HOST=postgresql
+      - MYSQL_HOST=mysql
