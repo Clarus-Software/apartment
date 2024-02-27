@@ -2,7 +2,7 @@
 
 # rubocop:disable Style/ClassAndModuleChildren
 
-# NOTE: This patch is meant to remove any schema_prefix appart from the ones for
+# NOTE: This patch is meant to remove any schema_prefix apart from the ones for
 # excluded models. The schema_prefix would be resolved by apartment's setting
 # of search path
 module Apartment::PostgreSqlAdapterPatch

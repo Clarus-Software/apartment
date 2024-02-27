@@ -4,7 +4,6 @@
 #
 # require 'apartment/elevators/generic'
 # require 'apartment/elevators/domain'
-require 'apartment/elevators/subdomain'
 
 #
 # Apartment Configuration
@@ -21,7 +20,6 @@ Apartment.configure do |config|
   config.excluded_models = %w[]
 
   # use postgres schemas?
-  config.use_schemas = true
 
   # use raw SQL dumps for creating postgres schemas? (only appies with use_schemas set to true)
   # config.use_sql = true
@@ -48,6 +46,3 @@ end
 #   # TODO: supply generic implementation
 # }
 
-# Rails.application.config.middleware.use Apartment::Elevators::Domain
-
-Rails.application.config.middleware.use Apartment::Elevators::Subdomain

@@ -9,7 +9,6 @@ describe 'connection handling monkey patch' do
     Apartment.configure do |config|
       config.excluded_models = ['Company']
       config.tenant_names = -> { Company.pluck(:database) }
-      config.use_schemas = true
     end
 
     Apartment::Tenant.reload!(config)

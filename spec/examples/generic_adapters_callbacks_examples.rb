@@ -11,11 +11,6 @@ shared_examples_for 'a generic apartment adapter callbacks' do
 
   include Apartment::Spec::AdapterRequirements
 
-  before do
-    Apartment.prepend_environment = false
-    Apartment.append_environment = false
-  end
-
   describe '#switch!' do
     before do
       Apartment::Adapters::AbstractAdapter.set_callback :switch, :before do

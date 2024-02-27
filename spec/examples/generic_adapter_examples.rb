@@ -5,12 +5,6 @@ require 'spec_helper'
 shared_examples_for 'a generic apartment adapter' do
   include Apartment::Spec::AdapterRequirements
 
-  before do
-    Apartment.prepend_environment = false
-    Apartment.append_environment = false
-    Apartment.tenant_presence_check = true
-  end
-
   describe '#init' do
     it 'should not retain a connection after railtie' do
       ActiveRecord::Base.connection_pool.disconnect!
@@ -73,22 +67,6 @@ shared_examples_for 'a generic apartment adapter' do
       expect(subject.current).not_to eq(db2)
 
       subject.switch(db2) { expect(User.count).to eq(@count + 1) }
-    end
-
-    it 'should raise error when the schema.rb is missing unless Apartment.use_sql is set to true' do
-      next if Apartment.use_sql
-
-      subject.drop(db1)
-      begin
-        Dir.mktmpdir do |tmpdir|
-          Apartment.database_schema_file = "#{tmpdir}/schema.rb"
-          expect do
-            subject.create(db1)
-          end.to raise_error(Apartment::FileNotFound)
-        end
-      ensure
-        Apartment.remove_instance_variable(:@database_schema_file)
-      end
     end
   end
 

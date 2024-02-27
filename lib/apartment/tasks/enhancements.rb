@@ -7,7 +7,7 @@ module Apartment
   class RakeTaskEnhancer
     module TASKS
       ENHANCE_BEFORE = %w[db:drop].freeze
-      ENHANCE_AFTER  = %w[db:migrate db:rollback db:migrate:up db:migrate:down db:migrate:redo db:seed].freeze
+      ENHANCE_AFTER  = %w[db:migrate db:rollback db:migrate:up db:migrate:down db:migrate:redo].freeze
       freeze
     end
 
@@ -16,23 +16,19 @@ module Apartment
 
     class << self
       def enhance!
-        return unless should_enhance?
-
         # insert task before
-        TASKS::ENHANCE_BEFORE.each do |name|
-          task = Rake::Task[name]
-          enhance_before_task(task)
-        end
+
+        # JAKUB TODO: TEST IF NEEDED
+        # TASKS::ENHANCE_BEFORE.each do |name|
+        #   task = Rake::Task[name]
+        #   enhance_before_task(task)
+        # end
 
         # insert task after
         TASKS::ENHANCE_AFTER.each do |name|
           task = Rake::Task[name]
           enhance_after_task(task)
         end
-      end
-
-      def should_enhance?
-        Apartment.db_migrate_tenants
       end
 
       def enhance_before_task(task)

@@ -87,38 +87,6 @@ namespace :postgres do
   end
 end
 
-namespace :mysql do
-  require 'active_record'
-  require File.join(File.dirname(__FILE__), 'spec', 'support', 'config').to_s
-
-  desc 'Build the MySQL test databases'
-  task :build_db do
-    params = []
-    params << "-h #{my_config['host']}" if my_config['host']
-    params << "-u #{my_config['username']}" if my_config['username']
-    params << "-p#{my_config['password']}" if my_config['password']
-    params << "--port #{my_config['port']}" if my_config['port']
-    begin
-      `mysqladmin #{params.join(' ')} create #{my_config['database']}`
-    rescue StandardError
-      'test db already exists'
-    end
-    ActiveRecord::Base.establish_connection my_config
-    migrate
-  end
-
-  desc 'drop the MySQL test database'
-  task :drop_db do
-    puts "dropping database #{my_config['database']}"
-    params = []
-    params << "-h #{my_config['host']}" if my_config['host']
-    params << "-u #{my_config['username']}" if my_config['username']
-    params << "-p#{my_config['password']}" if my_config['password']
-    params << "--port #{my_config['port']}" if my_config['port']
-    `mysqladmin #{params.join(' ')} drop #{my_config['database']} --force`
-  end
-end
-
 # TODO: clean this up
 def config
   Apartment::Test.config['connections']
@@ -128,26 +96,6 @@ def pg_config
   config['postgresql']
 end
 
-def my_config
-  config['mysql']
-end
-
-def activerecord_below_5_2?
-  ActiveRecord.version.release < Gem::Version.new('5.2.0')
-end
-
-def activerecord_below_6_0?
-  ActiveRecord.version.release < Gem::Version.new('6.0.0')
-end
-
 def migrate
-  if activerecord_below_5_2?
-    ActiveRecord::Migrator.migrate('spec/dummy/db/migrate')
-  elsif activerecord_below_6_0?
-    ActiveRecord::MigrationContext.new('spec/dummy/db/migrate').migrate
-  else
-    # TODO: Figure out if there is any other possibility that can/should be
-    # passed here as the second argument for the migration context
-    ActiveRecord::MigrationContext.new('spec/dummy/db/migrate', ActiveRecord::SchemaMigration).migrate
-  end
+  ActiveRecord::MigrationContext.new('spec/dummy/db/migrate', ActiveRecord::SchemaMigration).migrate
 end

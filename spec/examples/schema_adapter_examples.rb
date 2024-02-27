@@ -185,10 +185,6 @@ shared_examples_for 'a schema based apartment adapter' do
   end
 
   describe '#switch!' do
-    let(:tenant_presence_check) { true }
-
-    before { Apartment.tenant_presence_check = tenant_presence_check }
-
     it 'should connect to new schema' do
       subject.switch!(schema1)
       expect(connection.schema_search_path).to start_with %("#{schema1}")
@@ -204,16 +200,6 @@ shared_examples_for 'a schema based apartment adapter' do
         expect do
           subject.switch! 'unknown_schema'
         end.to raise_error(Apartment::TenantNotFound)
-      end
-    end
-
-    context 'when configuration skips tenant presence check before switching' do
-      let(:tenant_presence_check) { false }
-
-      it 'should not raise any errors' do
-        expect do
-          subject.switch! 'unknown_schema'
-        end.not_to raise_error(Apartment::TenantNotFound)
       end
     end
 
