@@ -8,7 +8,6 @@ require 'apartment/tenant'
 
 require_relative 'apartment/active_record/connection_handling'
 require_relative 'apartment/active_record/schema_migration'
-require_relative 'apartment/active_record/internal_metadata'
 
 # Apartment main definitions
 module Apartment
