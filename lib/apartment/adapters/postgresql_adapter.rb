@@ -11,7 +11,7 @@ module Apartment
   end
 
   module Adapters
-# Default adapter when not using Postgresql Schemas
+    # Default adapter when not using Postgresql Schemas
     class PostgresqlAdapter < AbstractAdapter
       private
 

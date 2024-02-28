@@ -17,7 +17,7 @@ WORKDIR /app
 COPY APARTMENT_VERSION APARTMENT_VERSION
 COPY Gemfile Gemfile
 COPY Appraisals Appraisals
-COPY ros-apartment.gemspec ros-apartment.gemspec
+COPY clarus-apartment.gemspec clarus-apartment.gemspec
 RUN gem install bundler:2.5.5
 RUN bundle install
 RUN bundle exec appraisal install

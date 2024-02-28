@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-
-    # This is monkeypatching Active Record to ensure that whenever a new connection is established it
-    # switches to the same tenant as before the connection switching. This problem is more evident when
-    # using read replica in Rails 6
+# This is monkeypatching Active Record to ensure that whenever a new connection is established to a shard
+# switches to the same tenant as before the connection switching.
 
 module ActiveRecord # :nodoc:
   module ConnectionHandling
