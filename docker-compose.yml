@@ -4,23 +4,9 @@ services:
     image: postgres:12.5
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
-    ports:
-      - "5432:5432"
     healthcheck:
       test: pg_isready -U postgres
       start_period: 10s
-      interval: 10s
-      timeout: 30s
-      retries: 3
-  mysql:
-    image: mysql:8.0
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-    ports:
-      - "3306:3306"
-    healthcheck:
-      test: mysqladmin -h 127.0.0.1 -uroot ping
-      start_period: 15s
       interval: 10s
       timeout: 30s
       retries: 3
@@ -29,9 +15,7 @@ services:
       context: .
     depends_on:
       - postgresql
-      - mysql
     volumes:
       - .:/app
     environment:
       - PG_HOST=postgresql
-      - MYSQL_HOST=mysql
