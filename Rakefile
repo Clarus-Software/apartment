@@ -37,7 +37,7 @@ task default: :spec
 
 namespace :db do
   namespace :test do
-    task prepare: %w[postgres:drop_db postgres:build_db mysql:drop_db mysql:build_db]
+    task prepare: %w[postgres:drop_db postgres:build_db]
   end
 
   desc "copy sample database credential files over if real files don't exist"
