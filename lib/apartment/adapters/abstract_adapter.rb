@@ -27,9 +27,6 @@ module Apartment
           switch(tenant) do
             import_database_schema
 
-            # Seed data if appropriate
-            seed_data if Apartment.seed_after_create
-
             yield if block_given?
           end
         end
@@ -119,31 +116,6 @@ module Apartment
         Apartment.establish_connection @config
       end
 
-      #   Load the rails seed file into the db
-      #
-      def seed_data
-        # Don't log the output of seeding the db
-        silence_warnings { load_or_raise(Apartment.seed_data_file) } if Apartment.seed_data_file
-      end
-      alias seed seed_data
-
-      #   Prepend the environment if configured and the environment isn't already there
-      #
-      #   @param {String} tenant Database name
-      #   @return {String} tenant name with Rails environment *optionally* prepended
-      #
-      def environmentify(tenant)
-        return tenant if tenant.nil? || tenant.include?(Rails.env)
-
-        if Apartment.prepend_environment
-          "#{Rails.env}_#{tenant}"
-        elsif Apartment.append_environment
-          "#{tenant}_#{Rails.env}"
-        else
-          tenant
-        end
-      end
-
       protected
 
       def process_excluded_model(excluded_model)
@@ -152,7 +124,7 @@ module Apartment
 
       def drop_command(conn, tenant)
         # connection.drop_database   note that drop_database will not throw an exception, so manually execute
-        conn.execute("DROP DATABASE #{conn.quote_table_name(environmentify(tenant))}")
+        conn.execute("DROP DATABASE #{conn.quote_table_name(tenant)}")
       end
 
       #   Create the tenant
@@ -168,7 +140,7 @@ module Apartment
       end
 
       def create_tenant_command(conn, tenant)
-        conn.create_database(environmentify(tenant), @config)
+        conn.create_database(tenant, @config)
       end
 
       #   Connect to new tenant
@@ -210,7 +182,7 @@ module Apartment
       # rubocop:enable Style/OptionalBooleanParameter
 
       def multi_tenantify_with_tenant_db_name(config, tenant)
-        config[:database] = environmentify(tenant)
+        config[:database] = tenant
       end
 
       #   Load a file or raise error if it doesn't exists
@@ -257,15 +229,15 @@ module Apartment
       end
 
       def raise_drop_tenant_error!(tenant, exception)
-        raise TenantNotFound, "Error while dropping tenant #{environmentify(tenant)}: #{exception.message}"
+        raise TenantNotFound, "Error while dropping tenant #{tenant}: #{exception.message}"
       end
 
       def raise_create_tenant_error!(tenant, exception)
-        raise TenantExists, "Error while creating tenant #{environmentify(tenant)}: #{exception.message}"
+        raise TenantExists, "Error while creating tenant #{tenant}: #{exception.message}"
       end
 
       def raise_connect_error!(tenant, exception)
-        raise TenantNotFound, "Error while connecting to tenant #{environmentify(tenant)}: #{exception.message}"
+        raise TenantNotFound, "Error while connecting to tenant #{tenant}: #{exception.message}"
       end
 
       class SeparateDbConnectionHandler < ::ActiveRecord::Base

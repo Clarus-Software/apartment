@@ -14,6 +14,6 @@ gem "rubocop-performance", "~> 1.10"
 gem "rubocop-rails", "~> 2.1"
 gem "rubocop-rspec", "~> 1.44"
 gem "pg", "~> 1.2"
-gem "rails", "~> 7.0.0"
+gem "rails", "~> 7.1.0"
 
 gemspec path: "../"

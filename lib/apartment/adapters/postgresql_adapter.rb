@@ -6,10 +6,7 @@ require 'apartment/active_record/postgresql_adapter'
 module Apartment
   module Tenant
     def self.postgresql_adapter(config)
-      adapter = Adapters::PostgresqlAdapter
-      adapter = Adapters::PostgresqlSchemaAdapter if Apartment.use_schemas
-      adapter = Adapters::PostgresqlSchemaFromSqlAdapter if Apartment.use_sql && Apartment.use_schemas
-      adapter.new(config)
+      Adapters::PostgresqlSchemaFromSqlAdapter.new(config)
     end
   end
 
@@ -88,8 +85,6 @@ module Apartment
       private
 
       def tenant_exists?(tenant)
-        return true unless Apartment.tenant_presence_check
-
         Apartment.connection.schema_exists?(tenant)
       end
 
@@ -130,8 +125,6 @@ module Apartment
       end
 
       def schema_exists?(schemas)
-        return true unless Apartment.tenant_presence_check
-
         Array(schemas).all? { |schema| Apartment.connection.schema_exists?(schema.to_s) }
       end
 

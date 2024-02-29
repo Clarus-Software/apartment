@@ -1,8 +1,6 @@
 # Apartment
 
-[![Gem Version](https://badge.fury.io/rb/ros-apartment.svg)](https://badge.fury.io/rb/apartment)
-[![Code Climate](https://api.codeclimate.com/v1/badges/b0dc327380bb8438f991/maintainability)](https://codeclimate.com/github/rails-on-services/apartment/maintainability)
-[![Build Status](https://travis-ci.org/rails-on-services/apartment.svg?branch=development)](https://travis-ci.org/rails-on-services/apartment)
+[![Gem Version] 3.0]
 
 *Multitenancy for Rails and ActiveRecord*
 
@@ -33,7 +31,7 @@ may find or proposing improvements to the gem itself. Feel free to reach out.
 Add the following to your Gemfile:
 
 ```ruby
-gem 'ros-apartment', require: 'apartment'
+gem "clarus-apartment", require: "apartment", branch: "main", github: "Clarus-Software/apartment"
 ```
 
 Then generate your `Apartment` config file using
@@ -300,26 +298,6 @@ Apartment::Tenant.drop('tenant_name')
 When method is called, the schema is dropped and all data from itself will be lost. Be careful with this method.
 
 ### Custom Prompt
-
-#### Console methods
-
-`ros-apartment` console configures two helper methods:
-1. `tenant_list` - list available tenants while using the console
-2. `st(tenant_name:String)` - Switches the context to the tenant name passed, if
-it exists.
-
-#### Custom printed prompt
-
-`ros-apartment` also has a custom prompt that gives a bit more information about
-the context in which you're running. It shows the environment as well as the tenant
-that is currently switched to. In order for you to enable this, you need to require
-the custom console in your application.
-
-In `application.rb` add `require 'apartment/custom_console'`.
-Please note that we rely on `pry-rails` to edit the prompt, thus your project needs
-to install it as well. In order to do so, you need to add `gem 'pry-rails'` to your
-project's gemfile.
-
 ## Config
 
 The following config options should be set up in a Rails initializer such as:
@@ -333,38 +311,6 @@ Apartment.configure do |config|
   # set your options (described below) here
 end
 ```
-
-### Skip tenant schema check
-
-This is configurable by setting: `tenant_presence_check`. It defaults to true
-in order to maintain the original gem behavior. This is only checked when using one of the PostgreSQL adapters.
-The original gem behavior, when running `switch` would look for the existence of the schema before switching. This adds an extra query on every context switch. While in the default simple scenarios this is a valid check, in high volume platforms this adds some unnecessary overhead which can be detected in some other ways on the application level.
-
-Setting this configuration value to `false` will disable the schema presence check before trying to switch the context.
-
-```ruby
-Apartment.configure do |config|
-  config.tenant_presence_check = false
-end
-```
-
-### Additional logging information
-
-Enabling this configuration will output the database that the process is currently connected to as well as which
-schemas are in the search path. This can be enabled by setting to true the `active_record_log` configuration.
-
-Please note that our custom logger inherits from `ActiveRecord::LogSubscriber` so this will be required for the configuration to work.
-
-**Example log output:**
-
-<img src="documentation/images/log_example.png">
-
-```ruby
-Apartment.configure do |config|
-  config.active_record_log = true
-end
-```
-
 ### Excluding models
 
 If you have some models that should always access the 'public' tenant, you can specify this by configuring Apartment using `Apartment.configure`. This will yield a config object for you. You can set excluded models like so:
@@ -549,16 +495,6 @@ Keep in mind that because migrations are going to access the database,
 the number of threads indicated here should be less than the pool size
 that Rails will use to connect to your database.
 
-### Handling Environments
-
-By default, when not using postgresql schemas, Apartment will prepend the environment to the tenant name
-to ensure there is no conflict between your environments. This is mainly for the benefit of your development
-and test environments. If you wish to turn this option off in production, you could do something like:
-
-```ruby
-config.prepend_environment = !Rails.env.production?
-```
-
 ## Tenants on different servers
 
 You can store your tenants in different databases on one or more servers.
@@ -587,15 +523,6 @@ config.tenant_names = lambda do
 end
 ```
 
-## Background workers
-
-Both these gems have been forked as a side consequence of having a new gem name.
-You can use them exactly as you were using before. They are, just like this one
-a drop-in replacement.
-
-See [apartment-sidekiq](https://github.com/rails-on-services/apartment-sidekiq)
-or [apartment-activejob](https://github.com/rails-on-services/apartment-activejob).
-
 ## Callbacks
 
 You can execute callbacks when switching between tenants or creating a new one, Apartment provides the following callbacks:
@@ -621,16 +548,6 @@ module Apartment
 end
 ```
 
-## Running rails console without a connection to the database
-
-By default, once apartment starts, it establishes a connection to the database. It is possible to
-disable this initial connection, by running with `APARTMENT_DISABLE_INIT` set to something:
-
-```shell
-$ APARTMENT_DISABLE_INIT=true DATABASE_URL=postgresql://localhost:1234/buk_development bin/rails runner 'puts 1'
-# 1
-```
-
 ## Contributing
 
 * In both `spec/dummy/config` and `spec/config`, you will see `database.yml.sample` files
@@ -642,12 +559,31 @@ $ APARTMENT_DISABLE_INIT=true DATABASE_URL=postgresql://localhost:1234/buk_devel
 
 * If you're looking to help, check out the TODO file for some upcoming changes I'd like to implement in Apartment.
 
-### Running bundle install
+### Gemspec versioning
 
-mysql2 gem in some cases fails to install.
-If you face problems running bundle install in OSX, try installing the gem running:
+This gem can be tested on multiple rails versions, it's controller by Appraisal, currently supported versions are:
+* rails-7-0
+* rails-7-1
 
-`gem install mysql2 -v '0.5.3' -- --with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include`
+Install gems by running:
+`bundle exec appraisal install`
+
+And then you can run tests by running:
+`bundle exec appraisal rails-7-0 rspec`
+
+### Database setup
+
+Setup test database by running:
+`rake db:test:prepare`
+
+### Docker
+This project can be run in docker, you can simply run:
+```bash
+> docker-compose build
+> docker-compose run app bash
+  > bundle exec appraisal rails-7-1 rspec
+```
+To run all tests.
 
 ## License
 

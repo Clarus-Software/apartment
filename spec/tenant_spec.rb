@@ -3,44 +3,8 @@
 require 'spec_helper'
 
 describe Apartment::Tenant do
-  context 'using mysql', database: :mysql do
-    before { subject.reload!(config) }
-
-    describe '#adapter' do
-      it 'should load mysql adapter' do
-        subject.adapter
-        expect(Apartment::Adapters::Mysql2Adapter).to be_a(Class)
-      end
-    end
-
-    # TODO: re-organize these tests
-    context 'with prefix and schemas' do
-      describe '#create' do
-        before do
-          Apartment.configure do |config|
-            config.prepend_environment = true
-            config.use_schemas = true
-          end
-
-          subject.reload!(config)
-        end
-
-        after do
-          subject.drop 'db_with_prefix'
-        rescue StandardError => _e
-          nil
-        end
-
-        it 'should create a new database' do
-          subject.create 'db_with_prefix'
-        end
-      end
-    end
-  end
-
   context 'using postgresql', database: :postgresql do
     before do
-      Apartment.use_schemas = true
       subject.reload!(config)
     end
 
@@ -76,8 +40,6 @@ describe Apartment::Tenant do
       before do
         Apartment.configure do |config|
           config.excluded_models = []
-          config.use_schemas = true
-          config.seed_after_create = true
         end
         subject.create db1
       end
@@ -85,9 +47,13 @@ describe Apartment::Tenant do
       after { subject.drop db1 }
 
       describe '#create' do
-        it 'should seed data' do
-          subject.switch! db1
-          expect(User.count).to be > 0
+        it 'creates schema' do
+          subject.switch(db1) do
+            expect(User.count).to be_zero
+            User.create
+            expect(User.count).to eq(1)
+          end
+          expect(User.count).to be_zero
         end
       end
 
@@ -141,35 +107,6 @@ describe Apartment::Tenant do
             expect(Company.count).to eq(count + x)
           end
         end
-      end
-    end
-
-    context 'seed paths' do
-      before do
-        Apartment.configure do |config|
-          config.excluded_models = []
-          config.use_schemas = true
-          config.seed_after_create = true
-        end
-      end
-
-      after { subject.drop db1 }
-
-      it 'should seed from default path' do
-        subject.create db1
-        subject.switch! db1
-        expect(User.count).to eq(3)
-        expect(User.first.name).to eq('Some User 0')
-      end
-
-      it 'should seed from custom path' do
-        Apartment.configure do |config|
-          config.seed_data_file = Rails.root.join('db/seeds/import.rb')
-        end
-        subject.create db1
-        subject.switch! db1
-        expect(User.count).to eq(6)
-        expect(User.first.name).to eq('Different User 0')
       end
     end
   end

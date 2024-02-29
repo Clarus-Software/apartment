@@ -30,22 +30,10 @@ module Apartment
       WARNING
     end
 
-    def self.create_tenant(tenant_name)
-      puts("Creating #{tenant_name} tenant")
-      Apartment::Tenant.create(tenant_name)
-    rescue Apartment::TenantExists => e
-      puts "Tried to create already existing tenant: #{e}"
-    end
-
     def self.migrate_tenant(tenant_name)
-      strategy = Apartment.db_migrate_tenant_missing_strategy
-      create_tenant(tenant_name) if strategy == :create_tenant
-
       puts("Migrating #{tenant_name} tenant")
       Apartment::Migrator.migrate tenant_name
     rescue Apartment::TenantNotFound => e
-      raise e if strategy == :raise_exception
-
       puts e.message
     end
   end

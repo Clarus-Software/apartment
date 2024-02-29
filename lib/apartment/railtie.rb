@@ -12,13 +12,7 @@ module Apartment
     config.before_initialize do
       Apartment.configure do |config|
         config.excluded_models = []
-        config.use_schemas = true
         config.tenant_names = []
-        config.seed_after_create = false
-        config.prepend_environment = false
-        config.append_environment = false
-        config.tenant_presence_check = true
-        config.active_record_log = false
       end
 
       ActiveRecord::Migrator.migrations_paths = Rails.application.paths['db/migrate'].to_a
@@ -41,19 +35,6 @@ module Apartment
       rescue ::ActiveRecord::NoDatabaseError
         # Since `db:create` and other tasks invoke this block from Rails 5.2.0,
         # we need to swallow the error to execute `db:create` properly.
-      end
-    end
-
-    config.after_initialize do
-      # NOTE: Load the custom log subscriber if enabled
-      if Apartment.active_record_log
-        ActiveSupport::Notifications.notifier.listeners_for('sql.active_record').each do |listener|
-          next unless listener.instance_variable_get('@delegate').is_a?(ActiveRecord::LogSubscriber)
-
-          ActiveSupport::Notifications.unsubscribe listener
-        end
-
-        Apartment::LogSubscriber.attach_to :active_record
       end
     end
 

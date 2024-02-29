@@ -5,15 +5,6 @@ require 'apartment/tasks/task_helper'
 require 'parallel'
 
 apartment_namespace = namespace :apartment do
-  desc 'Create all tenants'
-  task :create do
-    Apartment::TaskHelper.warn_if_tenants_empty
-
-    Apartment::TaskHelper.tenants.each do |tenant|
-      Apartment::TaskHelper.create_tenant(tenant)
-    end
-  end
-
   desc 'Drop all tenants'
   task :drop do
     Apartment::TaskHelper.tenants.each do |tenant|
@@ -29,21 +20,6 @@ apartment_namespace = namespace :apartment do
     Apartment::TaskHelper.warn_if_tenants_empty
     Apartment::TaskHelper.each_tenant do |tenant|
       Apartment::TaskHelper.migrate_tenant(tenant)
-    end
-  end
-
-  desc 'Seed all tenants'
-  task :seed do
-    Apartment::TaskHelper.warn_if_tenants_empty
-
-    Apartment::TaskHelper.each_tenant do |tenant|
-      Apartment::TaskHelper.create_tenant(tenant)
-      puts("Seeding #{tenant} tenant")
-      Apartment::Tenant.switch(tenant) do
-        Apartment::Tenant.seed
-      end
-    rescue Apartment::TenantNotFound => e
-      puts e.message
     end
   end
 
