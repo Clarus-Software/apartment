@@ -7,7 +7,6 @@ require 'active_record'
 require 'apartment/tenant'
 
 require_relative 'apartment/active_record/connection_handling'
-require_relative 'apartment/active_record/schema_migration'
 
 # Apartment main definitions
 module Apartment
