@@ -6,7 +6,7 @@ RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 
 #Install packages
-RUN apt-get update -qq && apt-get install -y postgresql-client-12 libpq-dev nodejs default-mysql-client
+RUN apt-get update -qq && apt-get install -y postgresql-client-15 libpq-dev nodejs default-mysql-client
 
 RUN mkdir -p /app
 
