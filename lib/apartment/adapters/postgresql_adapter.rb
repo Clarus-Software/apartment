@@ -146,6 +146,7 @@ module Apartment
         /SET default_table_access_method/i,           # new in postgresql 12
         /CREATE SCHEMA public/i,
         /COMMENT ON SCHEMA public/i,
+        /SET transaction_timeout/i,                   # new in postgresql 17
         /\\restrict/i,
         /\\unrestrict/i
       ].freeze
