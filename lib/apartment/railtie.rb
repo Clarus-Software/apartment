@@ -29,7 +29,14 @@ module Apartment
       next if ENV['APARTMENT_DISABLE_INIT']
 
       begin
-        Apartment.connection_class.connection_pool.with_connection do
+        with_connection_args =
+          if ActiveRecord.gem_version >= Gem::Version.new('7.2')
+            { prevent_permanent_checkout: true }
+          else
+            {}
+          end
+
+        Apartment.connection_class.connection_pool.with_connection(**with_connection_args) do
           Apartment::Tenant.init
         end
       rescue ::ActiveRecord::NoDatabaseError

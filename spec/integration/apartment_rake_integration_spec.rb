@@ -47,9 +47,17 @@ describe 'apartment rake tasks', database: :postgresql do
 
     let(:migration_context_double) { double(:migration_context) }
 
+    def stub_migration_context(double)
+      if ActiveRecord.gem_version >= Gem::Version.new('7.2')
+        allow(ActiveRecord::Base.connection_pool).to receive(:migration_context) { double }
+      else
+        allow(ActiveRecord::Base.connection).to receive(:migration_context) { double }
+      end
+    end
+
     describe '#migrate' do
       it 'should migrate all databases' do
-        allow(ActiveRecord::Base.connection).to receive(:migration_context) { migration_context_double }
+        stub_migration_context(migration_context_double)
         expect(migration_context_double).to receive(:migrate).exactly(company_count).times
 
         @rake['apartment:migrate'].invoke
@@ -58,7 +66,7 @@ describe 'apartment rake tasks', database: :postgresql do
 
     describe '#rollback' do
       it 'should rollback all dbs' do
-        allow(ActiveRecord::Base.connection).to receive(:migration_context) { migration_context_double }
+        stub_migration_context(migration_context_double)
         expect(migration_context_double).to receive(:rollback).exactly(company_count).times
 
         @rake['apartment:rollback'].invoke
