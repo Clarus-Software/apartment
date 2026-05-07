@@ -97,5 +97,10 @@ def pg_config
 end
 
 def migrate
-  ActiveRecord::MigrationContext.new('spec/dummy/db/migrate', ActiveRecord::SchemaMigration).migrate
+  if ActiveRecord.gem_version >= Gem::Version.new('7.2')
+    pool = ActiveRecord::Base.connection_pool
+    ActiveRecord::MigrationContext.new('spec/dummy/db/migrate', pool.schema_migration, pool.internal_metadata).migrate
+  else
+    ActiveRecord::MigrationContext.new('spec/dummy/db/migrate', ActiveRecord::SchemaMigration).migrate
+  end
 end

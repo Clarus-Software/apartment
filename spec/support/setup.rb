@@ -32,8 +32,13 @@ module Apartment
             Apartment.excluded_models.each do |model|
               klass = model.constantize
 
-              Apartment.connection_class.remove_connection(klass)
-              klass.clear_all_connections!
+              if ActiveRecord.gem_version >= Gem::Version.new('7.2')
+                klass.remove_connection
+                klass.connection_handler.clear_all_connections!
+              else
+                Apartment.connection_class.remove_connection(klass)
+                klass.clear_all_connections!
+              end
               klass.reset_table_name
             end
             Apartment.reset
